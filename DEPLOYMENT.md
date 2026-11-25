@@ -2,7 +2,11 @@
 
 ## URL public
 
-Chưa có URL đã xác minh. Phần triển khai cần dự án Railway hoặc Render có quyền deploy và Redis có thể truy cập từ dịch vụ.
+Render service đã triển khai thành công và được xác minh:
+
+`https://day14-agent-j9w7.onrender.com`
+
+Health checks trả về `200` cho cả `/health` và `/ready`.
 
 ## Cấu hình nền tảng
 
