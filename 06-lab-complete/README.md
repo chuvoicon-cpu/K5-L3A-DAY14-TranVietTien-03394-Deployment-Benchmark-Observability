@@ -1,7 +1,6 @@
 # Part 6 — Final Project: Production-ready AI Agent
 
-Bạn tự xây một AI agent đủ chuẩn production từ **bản khung** trong thư mục này, kết hợp mọi thứ đã học ở Part 1–5.
-Mọi file đều đã có sẵn, phần việc của bạn nằm ở các chỗ ghi `TODO`. Bản khung chạy được nhưng **chưa đạt tiêu chí nào**.
+Agent Part 6 kết hợp FastAPI với Redis để chia sẻ rate limit và ngân sách giữa các worker. Kết quả chấm local và trạng thái triển khai cloud nằm trong [MISSION_ANSWERS.md](../MISSION_ANSWERS.md) và [DEPLOYMENT.md](../DEPLOYMENT.md).
 
 Bài chỉ được tính hoàn thành khi script chấm báo **`PASS 12/12`**:
 
@@ -14,18 +13,18 @@ python check_production_ready.py
 
 ## Checklist Deliverable
 
-- [ ] Dockerfile (multi-stage, < 500 MB)
-- [ ] docker-compose.yml (agent + redis)
-- [ ] .dockerignore
-- [ ] Health check endpoint (`GET /health`)
-- [ ] Readiness endpoint (`GET /ready`)
-- [ ] API Key authentication
-- [ ] Rate limiting
-- [ ] Cost guard
-- [ ] Config từ environment variables
-- [ ] Structured logging
-- [ ] Graceful shutdown
-- [ ] Public URL ready (Railway / Render config)
+- [x] Dockerfile (multi-stage, < 500 MB)
+- [x] docker-compose.yml (agent + redis)
+- [x] .dockerignore
+- [x] Health check endpoint (`GET /health`)
+- [x] Readiness endpoint (`GET /ready`)
+- [x] API Key authentication
+- [x] Rate limiting
+- [x] Cost guard
+- [x] Config từ environment variables
+- [x] Structured logging
+- [x] Graceful shutdown
+- [x] Public URL ready (Railway / Render config)
 
 ---
 
@@ -52,24 +51,24 @@ Script tự khởi động agent của bạn, gọi API thật, build và chạy
 
 ---
 
-## Bản khung
+## Cấu trúc
 
 ```
 06-lab-complete/
 ├── app/
-│   ├── main.py           # TODO: /health, /ready, nối auth + rate limit + cost guard vào /ask, log JSON, shutdown
-│   ├── config.py         # TODO: đọc cấu hình từ biến môi trường
-│   ├── auth.py           # TODO: verify_api_key → 401
-│   ├── rate_limiter.py   # TODO: check_rate_limit → 429 (Redis)
-│   ├── cost_guard.py     # TODO: check_budget → 402, record_cost (Redis)
-│   └── redis_client.py   # TODO: kết nối Redis + redis_healthy() cho /ready
+│   ├── main.py           # /health, /ready, nối auth + rate limit + cost guard vào /ask, log JSON, shutdown
+│   ├── config.py         # đọc cấu hình từ biến môi trường
+│   ├── auth.py           # verify_api_key → 401
+│   ├── rate_limiter.py   # check_rate_limit → 429 (Redis)
+│   ├── cost_guard.py     # check_budget → 402, record_cost (Redis)
+│   └── redis_client.py   # kết nối Redis + redis_healthy() cho /ready
 ├── utils/mock_llm.py     # Mock LLM — có sẵn, không cần sửa
-├── Dockerfile            # TODO: viết lại thành multi-stage production
-├── docker-compose.yml    # TODO: thêm redis
-├── .dockerignore         # TODO
-├── .env.example          # TODO: liệt kê đủ biến
-├── railway.toml          # TODO (hoặc render.yaml)
-├── render.yaml           # TODO (hoặc railway.toml)
+├── Dockerfile            # viết lại thành multi-stage production
+├── docker-compose.yml    # thêm redis
+├── .dockerignore         # Loại trừ secret và file cục bộ
+├── .env.example          # liệt kê đủ biến
+├── railway.toml          # Cấu hình Railway
+├── render.yaml           # Cấu hình Render
 ├── requirements.txt      # Có sẵn
 ├── check_production_ready.py   # Script chấm — không sửa
 └── benchmark-observability/    # Part 7 — làm sau khi xong Part 6
@@ -83,15 +82,12 @@ Script tự khởi động agent của bạn, gọi API thật, build và chạy
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env
-
-# Chạy nhanh không cần Docker (cần Redis riêng nếu muốn test rate limit thật)
-AGENT_API_KEY=dev-key uvicorn app.main:app --reload
-
-# Chạy cả agent + redis
-docker compose up --build
+cp -n .env.example .env
+# Đặt AGENT_API_KEY=dev-key trong .env cho lần thử trên máy.
+docker compose up --build -d
 
 curl http://localhost:8000/health
+curl http://localhost:8000/ready
 curl -X POST http://localhost:8000/ask \
      -H "X-API-Key: dev-key" -H "Content-Type: application/json" \
      -d '{"question": "What is deployment?"}'
