@@ -38,7 +38,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: 
 printf 'X-API-Key: %s\n' "$AGENT_API_KEY" | curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -H @- -d '{"question":"Hello"}'
 ```
 
-Kết quả mong đợi là `200`, `200`, `401`, `200`. Ba kiểm tra đầu đã đạt trên Render. Lượt thử có khóa trên Render trả `401`; cần xác minh lại với khóa đang dùng của service. Trình chấm chạy local đã xác minh `/ask` trả `200` với khóa đúng.
+Đã xác minh cả bốn kiểm tra trên Render ngày 25/11/2026. `/health` và `/ready` trả `200`, `/ask` thiếu khóa trả `401`, và `/ask` với khóa hợp lệ trả `200`.
 
 ## Ảnh minh chứng
 

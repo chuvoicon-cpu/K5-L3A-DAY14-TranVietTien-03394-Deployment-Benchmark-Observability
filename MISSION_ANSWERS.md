@@ -57,7 +57,7 @@ Redis và Qdrant cùng tham gia stack. Ví dụ FastAPI dùng mock LLM để tr�
 
 URL cloud đã triển khai trên Render: `https://day14-agent-j9w7.onrender.com`. Hai endpoint `/health` và `/ready` đã được xác minh trả về HTTP 200. Xem cấu hình và lệnh xác minh trong [DEPLOYMENT.md](DEPLOYMENT.md).
 
-Ảnh minh chứng gồm [Blueprint](screenshots/dashboard.png), [trạng thái Live](screenshots/running.png) và [kết quả kiểm tra API công khai](screenshots/test.png).
+Ảnh minh chứng gồm [Blueprint](screenshots/dashboard.png), [trạng thái Live](screenshots/running.png) và [kết quả kiểm tra API công khai](screenshots/test.png). Trên Render, `POST /ask` thiếu khóa trả HTTP 401 và với khóa hợp lệ trả HTTP 200.
 
 `railway.toml` chọn Dockerfile builder và đặt `healthcheckPath` trong cấu hình deploy. Render Blueprint dùng YAML để mô tả web service, runtime Docker, thư mục gốc, health check và cách cấp biến môi trường. Railway đặt API key và URL Redis ở môi trường service. Blueprint hiện tạo API key và lấy URL nội bộ từ dịch vụ Render Key Value.
 
