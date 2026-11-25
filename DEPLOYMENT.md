@@ -8,6 +8,8 @@ Render service đã triển khai thành công và được xác minh:
 
 Health checks trả về `200` cho cả `/health` và `/ready`.
 
+Nền tảng chính là Render. Web service `day14-agent` chạy Docker, kết nối Key Value `day14-redis` qua mạng nội bộ.
+
 ## Cấu hình nền tảng
 
 - **Render.** Tạo Blueprint từ fork đã có bài làm và đặt Blueprint Path là `06-lab-complete/render.yaml`. Blueprint khai báo web service Docker và Key Value cùng gói free. Web service nhận `REDIS_URL` từ kết nối nội bộ và Render tự sinh `AGENT_API_KEY`. [Render Blueprint](https://render.com/docs/infrastructure-as-code) · [Tham chiếu cấu hình](https://render.com/docs/blueprint-spec)
@@ -26,13 +28,20 @@ Cả hai nền tảng dùng `/health` cho liveness. Xác minh thêm `/ready` sau
 
 ## Xác minh URL
 
-Khi đã đặt `BASE` và `AGENT_API_KEY` trong môi trường, bốn lệnh bên dưới chỉ in mã HTTP.
+Đặt `AGENT_API_KEY` trong môi trường của terminal trước khi chạy. Các lệnh chỉ in mã HTTP.
 
 ```bash
+BASE=https://day14-agent-j9w7.onrender.com
 curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/health"
 curl -sS -o /dev/null -w '%{http_code}\n' "$BASE/ready"
 curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -d '{"question":"Hello"}'
-curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -H "X-API-Key: $AGENT_API_KEY" -d '{"question":"Hello"}'
+printf 'X-API-Key: %s\n' "$AGENT_API_KEY" | curl -sS -o /dev/null -w '%{http_code}\n' -X POST "$BASE/ask" -H 'Content-Type: application/json' -H @- -d '{"question":"Hello"}'
 ```
 
-Kết quả mong đợi theo thứ tự là `200`, `200`, `401`, `200`. Ba ảnh cloud cần bổ sung sau khi có URL là `dashboard.png`, `running.png` và `test.png`.
+Kết quả mong đợi là `200`, `200`, `401`, `200`. Ba kiểm tra đầu đã đạt trên Render. Lượt thử có khóa trên Render trả `401`; cần xác minh lại với khóa đang dùng của service. Trình chấm chạy local đã xác minh `/ask` trả `200` với khóa đúng.
+
+## Ảnh minh chứng
+
+- [Render Blueprint đồng bộ thành công và tạo web service cùng Redis](screenshots/dashboard.png)
+- [Render Deploys hiển thị service Live và URL công khai](screenshots/running.png)
+- [Kết quả curl với API công khai trên Render](screenshots/test.png)

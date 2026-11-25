@@ -57,6 +57,8 @@ Redis và Qdrant cùng tham gia stack. Ví dụ FastAPI dùng mock LLM để tr�
 
 URL cloud đã triển khai trên Render: `https://day14-agent-j9w7.onrender.com`. Hai endpoint `/health` và `/ready` đã được xác minh trả về HTTP 200. Xem cấu hình và lệnh xác minh trong [DEPLOYMENT.md](DEPLOYMENT.md).
 
+Ảnh minh chứng gồm [Blueprint](screenshots/dashboard.png), [trạng thái Live](screenshots/running.png) và [kết quả kiểm tra API công khai](screenshots/test.png).
+
 `railway.toml` chọn Dockerfile builder và đặt `healthcheckPath` trong cấu hình deploy. Render Blueprint dùng YAML để mô tả web service, runtime Docker, thư mục gốc, health check và cách cấp biến môi trường. Railway đặt API key và URL Redis ở môi trường service. Blueprint hiện tạo API key và lấy URL nội bộ từ dịch vụ Render Key Value.
 
 ### Exercise 3.3
@@ -125,4 +127,5 @@ Chạy python check_production_ready.py với Docker và hai Uvicorn worker. Ima
 ## AI log
 
 - Yêu cầu Codex khảo sát repo, đối chiếu checkpoint, hoàn thiện Part 6, bổ sung knowledge base Part 7 và chạy các phép đo. Codex thực hiện thay đổi, chạy lệnh và tổng hợp kết quả quan sát được trong các tài liệu của repo.
+- Yêu cầu Codex bổ sung ảnh nộp bài. Codex dùng ảnh Render gốc của người nộp, chụp lại kết quả curl trên URL thật, chạy lại trình chấm với Docker và đối chiếu báo cáo với JSON/CSV.
 - Những phần cần người nộp tự kiểm tra là lý do dùng Redis, cách phân biệt liveness với readiness, cách trình chấm kiểm tra SIGTERM, giới hạn của cost guard, cùng việc đối chiếu từng bảng số liệu với JSON hoặc CSV. Chưa có xác nhận kiểm tra độc lập của người nộp.
